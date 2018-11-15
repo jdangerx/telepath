@@ -1,0 +1,2 @@
+# telepath
+read minds

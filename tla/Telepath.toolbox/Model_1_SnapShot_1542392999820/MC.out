@@ -1,0 +1,241 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.13 of 18 July 2018
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with seed 8849443146280662651 with 4 workers on 8 cores with 1214MB heap and 2730MB offheap memory (Mac OS X 10.13.6 x86_64, Oracle Corporation 1.8.0_162 x86_64).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Users/dsherry/development/recurse2018/telepath/tla/main.toolbox/Model_1/MC.tla
+Parsing file /Users/dsherry/development/recurse2018/telepath/tla/main.toolbox/Model_1/main.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201807180447/tla2sany/StandardModules/TLC.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201807180447/tla2sany/StandardModules/Integers.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201807180447/tla2sany/StandardModules/Sequences.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201807180447/tla2sany/StandardModules/Naturals.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201807180447/tla2sany/StandardModules/FiniteSets.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module TLC
+Semantic processing of module Integers
+Semantic processing of module main
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2018-11-16 13:29:53)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2212:0 @!@!@
+Implied-temporal checking--satisfiability problem has 1 branches.
+@!@!@ENDMSG 2212 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(16) at 2018-11-16 13:29:57: 821377 states generated, 225152 distinct states found, 0 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2192:0 @!@!@
+Checking temporal properties for the complete state space with 225152 total distinct states at (2018-11-16 13:29:57)
+@!@!@ENDMSG 2192 @!@!@
+@!@!@STARTMSG 2116:1 @!@!@
+Temporal properties were violated.
+
+@!@!@ENDMSG 2116 @!@!@
+@!@!@STARTMSG 2264:1 @!@!@
+The following behavior constitutes a counter-example:
+
+@!@!@ENDMSG 2264 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+1: <Initial predicate>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Client" @@ Server :> "Serve")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+2: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Client" @@ Server :> "Serve")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+3: <Serve line 79, col 16 to line 82, col 54 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Client" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+4: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+5: <Type line 56, col 15 to line 63, col 37 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Client" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+6: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+7: <Type line 56, col 15 to line 63, col 37 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+8: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Type" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+9: <Type line 56, col 15 to line 63, col 37 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+10: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<>> @@ c2 :> <<>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Get" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+11: <Get line 70, col 14 to line 75, col 34 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Type" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+12: <Type line 56, col 15 to line 63, col 37 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Client" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+13: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>)
+/\ pc = (c1 :> "Client" @@ c2 :> "Get" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+14: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = (c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@ c2 :> (c1 :> <<>> @@ c2 :> <<>>))
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>)
+/\ pc = (c1 :> "Get" @@ c2 :> "Get" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+15: <Get line 70, col 14 to line 75, col 34 of module main>
+/\ local_msgs = ( c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@
+  c2 :> (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>) )
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>)
+/\ pc = (c1 :> "Get" @@ c2 :> "Client" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2217:4 @!@!@
+16: <Client line 50, col 17 to line 54, col 55 of module main>
+/\ local_msgs = ( c1 :> (c1 :> <<3, 3>> @@ c2 :> <<3>>) @@
+  c2 :> (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>) )
+/\ all_msgs = (c1 :> <<3, 3>> @@ c2 :> <<3, 2>>)
+/\ pc = (c1 :> "Get" @@ c2 :> "Get" @@ Server :> "Done")
+
+@!@!@ENDMSG 2217 @!@!@
+@!@!@STARTMSG 2218:4 @!@!@
+17: Stuttering
+@!@!@ENDMSG 2218 @!@!@
+@!@!@STARTMSG 2267:0 @!@!@
+Finished checking temporal properties in 01s at 2018-11-16 13:29:58
+@!@!@ENDMSG 2267 @!@!@
+@!@!@STARTMSG 2201:0 @!@!@
+The coverage statistics at 2018-11-16 13:29:58
+@!@!@ENDMSG 2201 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 51, col 26 to line 51, col 59 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 52, col 26 to line 52, col 61 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 53, col 26 to line 53, col 58 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 54, col 33 to line 54, col 40 of module main: 337728
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 54, col 43 to line 54, col 52 of module main: 337728
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 59, col 31 to line 59, col 95 of module main: 50016
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 61, col 39 to line 61, col 46 of module main: 95904
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 62, col 18 to line 62, col 53 of module main: 145920
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 63, col 28 to line 63, col 37 of module main: 145920
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 67, col 20 to line 67, col 55 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 68, col 33 to line 68, col 40 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 68, col 43 to line 68, col 52 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 71, col 17 to line 71, col 68 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 74, col 17 to line 74, col 52 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 75, col 27 to line 75, col 34 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 81, col 19 to line 81, col 52 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 82, col 32 to line 82, col 39 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 82, col 42 to line 82, col 51 of module main: 112576
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2202:0 @!@!@
+End of statistics.
+@!@!@ENDMSG 2202 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(16) at 2018-11-16 13:29:58: 821377 states generated (8,944,214 s/min), 225152 distinct states found (2,451,745 ds/min), 0 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+821377 states generated, 225152 distinct states found, 0 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 5862ms at (2018-11-16 13:29:58)
+@!@!@ENDMSG 2186 @!@!@

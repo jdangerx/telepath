@@ -1,103 +1,106 @@
 -------------------------------- MODULE main --------------------------------
 EXTENDS TLC, Integers, Sequences
 
-CONSTANTS Clients, Server, NULL
+CONSTANTS Clients, Server, NULL, MaxMessageLength
 
 Chars == 1..3
 
 (*--algorithm telepath
 variables
-  server = [c \in Clients |-> <<>>],
-  queue = <<>>;
+  all_msgs = [c \in Clients |-> <<>>],
+  \* what's in the pipes?
+  in_flight_msgs = [c \in Clients |-> <<>>];
 
-process client \in Clients
-variables own = <<>>, all = [c \in Clients |-> <<>>];
+fair process client \in Clients
+variables local_msgs = [c \in Clients |-> <<>>];
 begin
   Client:
+  while TRUE do
   either
   Type:
-    with c \in Chars do
-      own := own \o c;
-    end with 
+    if Len(all_msgs[self]) < MaxMessageLength then
+        with c \in Chars do
+            all_msgs[self] := all_msgs[self] \o << c >>;
+            \* add [source |-> self, msg |-> own_msg] to in_flight[self]
+        end with;
+    end if; 
   or
-  Send:
-    queue := queue \o [client |-> self, msg |-> own];
-  or
-  Get:
+  Delete:
     skip;
   end either;
+  Get:
+    \* await push from server, then: 
+    local_msgs := all_msgs;
+    assert local_msgs = all_msgs;
+  end while;
 end process;
 
-process server \in {Server}
-variables all = [c \in Clients |-> <<>>];
+\* server does stuff - receives messages from client, updates connections
+fair process server \in {Server}
+variables server_msgs = [c \in Clients |-> <<>>];
 begin
   Serve:
-    skip;
+  
 end process;
+
 end algorithm *)
 \* BEGIN TRANSLATION
-\* Process server at line 31 col 1 changed to server_
-\* Process variable all of process client at line 14 col 23 changed to all_
-VARIABLES server, queue, pc, own, all_, all
+VARIABLES all_msgs, pc, local_msgs
 
-vars == << server, queue, pc, own, all_, all >>
+vars == << all_msgs, pc, local_msgs >>
 
-ProcSet == (Clients) \cup ({Server})
+ProcSet == (Clients)
 
 Init == (* Global variables *)
-        /\ server = [c \in Clients |-> <<>>]
-        /\ queue = <<>>
+        /\ all_msgs = [c \in Clients |-> <<>>]
         (* Process client *)
-        /\ own = [self \in Clients |-> <<>>]
-        /\ all_ = [self \in Clients |-> [c \in Clients |-> <<>>]]
-        (* Process server_ *)
-        /\ all = [self \in {Server} |-> [c \in Clients |-> <<>>]]
-        /\ pc = [self \in ProcSet |-> CASE self \in Clients -> "Client"
-                                        [] self \in {Server} -> "Serve"]
+        /\ local_msgs = [self \in Clients |-> [c \in Clients |-> <<>>]]
+        /\ pc = [self \in ProcSet |-> "Client"]
 
 Client(self) == /\ pc[self] = "Client"
                 /\ \/ /\ pc' = [pc EXCEPT ![self] = "Type"]
-                   \/ /\ pc' = [pc EXCEPT ![self] = "Send"]
-                   \/ /\ pc' = [pc EXCEPT ![self] = "Get"]
-                /\ UNCHANGED << server, queue, own, all_, all >>
-
-Type(self) == /\ pc[self] = "Type"
-              /\ \E c \in Chars:
-                   own' = [own EXCEPT ![self] = own[self] \o c]
-              /\ pc' = [pc EXCEPT ![self] = "Done"]
-              /\ UNCHANGED << server, queue, all_, all >>
-
-Send(self) == /\ pc[self] = "Send"
-              /\ queue' = queue \o [client |-> self, msg |-> own[self]]
-              /\ pc' = [pc EXCEPT ![self] = "Done"]
-              /\ UNCHANGED << server, own, all_, all >>
+                   \/ /\ pc' = [pc EXCEPT ![self] = "Delete"]
+                /\ UNCHANGED << all_msgs, local_msgs >>
 
 Get(self) == /\ pc[self] = "Get"
-             /\ TRUE
-             /\ pc' = [pc EXCEPT ![self] = "Done"]
-             /\ UNCHANGED << server, queue, own, all_, all >>
+             /\ local_msgs' = [local_msgs EXCEPT ![self] = all_msgs]
+             /\ Assert(local_msgs'[self] = all_msgs, 
+                       "Failure of assertion at line 32, column 5.")
+             /\ pc' = [pc EXCEPT ![self] = "Client"]
+             /\ UNCHANGED all_msgs
 
-client(self) == Client(self) \/ Type(self) \/ Send(self) \/ Get(self)
+Type(self) == /\ pc[self] = "Type"
+              /\ IF Len(all_msgs[self]) < MaxMessageLength
+                    THEN /\ \E c \in Chars:
+                              all_msgs' = [all_msgs EXCEPT ![self] = all_msgs[self] \o << c >>]
+                    ELSE /\ TRUE
+                         /\ UNCHANGED all_msgs
+              /\ pc' = [pc EXCEPT ![self] = "Get"]
+              /\ UNCHANGED local_msgs
 
-Serve(self) == /\ pc[self] = "Serve"
-               /\ TRUE
-               /\ pc' = [pc EXCEPT ![self] = "Done"]
-               /\ UNCHANGED << server, queue, own, all_, all >>
+Delete(self) == /\ pc[self] = "Delete"
+                /\ TRUE
+                /\ pc' = [pc EXCEPT ![self] = "Get"]
+                /\ UNCHANGED << all_msgs, local_msgs >>
 
-server_(self) == Serve(self)
+client(self) == Client(self) \/ Get(self) \/ Type(self) \/ Delete(self)
 
 Next == (\E self \in Clients: client(self))
-           \/ (\E self \in {Server}: server_(self))
-           \/ (* Disjunct to prevent deadlock on termination *)
-              ((\A self \in ProcSet: pc[self] = "Done") /\ UNCHANGED vars)
 
-Spec == Init /\ [][Next]_vars
-
-Termination == <>(\A self \in ProcSet: pc[self] = "Done")
+Spec == /\ Init /\ [][Next]_vars
+        /\ \A self \in Clients : WF_vars(client(self))
 
 \* END TRANSLATION
 
+TypeInvariant ==
+  /\ \A c \in Clients: Len(all_msgs[c]) <= MaxMessageLength
+  
+  
+EventualConsistency ==
+  /\ \A c \in Clients: <>[](all_msgs = local_msgs[c]) 
+
 =============================================================================
 \* Modification History
+\* Last modified Fri Nov 16 14:18:13 EST 2018 by dsherry
 \* Last modified Thu Nov 15 13:53:42 EST 2018 by john
 \* Created Thu Nov 15 11:56:05 EST 2018 by john

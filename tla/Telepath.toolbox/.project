@@ -16,6 +16,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>PT.tla</name>
+			<type>1</type>
+			<location>/home/john/telepath/tla/PT.tla</location>
+		</link>
+		<link>
 			<name>main.tla</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/main.tla</locationURI>

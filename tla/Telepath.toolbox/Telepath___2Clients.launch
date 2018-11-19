@@ -19,7 +19,7 @@
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
-    <stringAttribute key="modelBehaviorVars" value="local_msgs, all_msgs, in_flight_msgs, pc, server_msgs"/>
+    <stringAttribute key="modelBehaviorVars" value="local_msgs, own_msg, from_server, to_server, pc, server_msgs"/>
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">

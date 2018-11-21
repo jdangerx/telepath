@@ -19,25 +19,21 @@
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="Spec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
-    <stringAttribute key="modelBehaviorVars" value="local_msgs, own_msg, from_server, ghost_all_msgs, to_server, pc, server_msgs"/>
+    <stringAttribute key="modelBehaviorVars" value="typed, from_server, local_state, to_server, pc"/>
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
-        <listEntry value="1TypeInvariant"/>
+        <listEntry value="1ConsistencyWhenDone"/>
     </listAttribute>
-    <listAttribute key="modelCorrectnessProperties">
-        <listEntry value="1SendsArePropagated"/>
-        <listEntry value="1EventuallyConsistent"/>
-    </listAttribute>
-    <stringAttribute key="modelExpressionEval" value="SubSeq(&lt;&lt;1&gt;&gt;, 1, 0)"/>
+    <listAttribute key="modelCorrectnessProperties"/>
+    <stringAttribute key="modelExpressionEval" value=""/>
     <stringAttribute key="modelParameterActionConstraint" value=""/>
     <listAttribute key="modelParameterConstants">
-        <listEntry value="Clients;;{c1, c2};1;0"/>
-        <listEntry value="NULL;;NULL;1;0"/>
         <listEntry value="MaxMessageLength;;1;0;0"/>
         <listEntry value="Server;;Server;1;0"/>
-        <listEntry value="MaxQueueLength;;1;0;0"/>
-        <listEntry value="Chars;;1..2;0;0"/>
+        <listEntry value="Chars;;{&quot;a&quot;, &quot;b&quot;};0;0"/>
+        <listEntry value="Users;;{u1, u2};1;0"/>
+        <listEntry value="NULL;;NULL;1;0"/>
     </listAttribute>
     <stringAttribute key="modelParameterContraint" value=""/>
     <listAttribute key="modelParameterDefinitions"/>

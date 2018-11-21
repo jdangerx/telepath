@@ -1,19 +1,33 @@
 -------------------------------- MODULE main --------------------------------
 EXTENDS TLC, Integers, Sequences, FiniteSets
 
-CONSTANTS Clients, Server, NULL, MaxMessageLength
-
-Chars == 1..3
+CONSTANTS Clients, Server, NULL, MaxMessageLength, MaxQueueLength, Chars
 
 (*--algorithm telepath
+\* Sequences in to_server and from_server are sequences of updates sent 
+\* between client and server; sequences in ghost_all_messages are the literal
+\* messages the clients have typed 
 variables
   to_server = [c \in Clients |-> <<>>],
-  from_server = [c \in Clients |-> <<>>];
+  from_server = [c \in Clients |-> <<>>],
+  ghost_all_msgs = [c \in Clients |-> <<>>];
 
 define
   ClientsWithChanges == {c \in Clients: to_server[c] /= <<>>}
-end define
+  AppendQueue(queue, elt) ==
+    IF Len(queue) < MaxQueueLength
+    THEN Append(queue, elt)
+    ELSE Append(SubSeq(queue, Len(queue) - MaxQueueLength  + 2, Len(queue)), elt)
+end define;
 
+macro send_message()
+begin
+  local_msgs[self] := own_msg;
+  ghost_all_msgs[self] := own_msg;
+  to_server[self] := AppendQueue(to_server[self], [source |-> self, msg |-> own_msg]);
+end macro;
+
+\* assume client does not crash
 fair process client \in Clients
 variables local_msgs = [c \in Clients |-> <<>>], own_msg = <<>>;
 begin
@@ -24,13 +38,18 @@ begin
     if Len(own_msg) < MaxMessageLength then
         with c \in Chars do
             own_msg := Append(own_msg, c);
-            local_msgs[self] := own_msg;
-            to_server[self] := Append(to_server[self], [source |-> self, msg |-> own_msg]);
+            send_message();
         end with;
     end if; 
   or
   Delete:
-    skip;
+    if Len(own_msg) = 1 then
+      own_msg := <<>>;
+      send_message();      
+    elsif Len(own_msg) > 0 then
+      own_msg := SubSeq(own_msg, 1, Len(own_msg) - 1);
+      send_message();     
+    end if;  
   end either;
   Get:
     if from_server[self] /= <<>> then
@@ -43,7 +62,7 @@ begin
 end process;
 
 
-\* server does stuff - receives messages from client, updates connections
+\* assume server does not crash
 fair process server \in {Server}
 variables server_msgs = [c \in Clients |-> <<>>];
 begin
@@ -54,7 +73,7 @@ begin
       while Cardinality(ClientsWithChanges) > 0 do
         with source_client \in ClientsWithChanges do
           from_server := [
-            dest_client \in Clients |-> Append(from_server[dest_client], Head(to_server[source_client]))
+            dest_client \in Clients |-> AppendQueue(from_server[dest_client], Head(to_server[source_client]))
           ];
           to_server[source_client] := Tail(to_server[source_client]);
         end with;
@@ -68,20 +87,26 @@ end process;
 
 end algorithm *)
 \* BEGIN TRANSLATION
-VARIABLES to_server, from_server, pc
+VARIABLES to_server, from_server, ghost_all_msgs, pc
 
 (* define statement *)
 ClientsWithChanges == {c \in Clients: to_server[c] /= <<>>}
+AppendQueue(queue, elt) ==
+  IF Len(queue) < MaxQueueLength
+  THEN Append(queue, elt)
+  ELSE Append(SubSeq(queue, Len(queue) - MaxQueueLength  + 2, Len(queue)), elt)
 
 VARIABLES local_msgs, own_msg, server_msgs
 
-vars == << to_server, from_server, pc, local_msgs, own_msg, server_msgs >>
+vars == << to_server, from_server, ghost_all_msgs, pc, local_msgs, own_msg, 
+           server_msgs >>
 
 ProcSet == (Clients) \cup ({Server})
 
 Init == (* Global variables *)
         /\ to_server = [c \in Clients |-> <<>>]
         /\ from_server = [c \in Clients |-> <<>>]
+        /\ ghost_all_msgs = [c \in Clients |-> <<>>]
         (* Process client *)
         /\ local_msgs = [self \in Clients |-> [c \in Clients |-> <<>>]]
         /\ own_msg = [self \in Clients |-> <<>>]
@@ -93,8 +118,8 @@ Init == (* Global variables *)
 Client(self) == /\ pc[self] = "Client"
                 /\ \/ /\ pc' = [pc EXCEPT ![self] = "Type"]
                    \/ /\ pc' = [pc EXCEPT ![self] = "Delete"]
-                /\ UNCHANGED << to_server, from_server, local_msgs, own_msg, 
-                                server_msgs >>
+                /\ UNCHANGED << to_server, from_server, ghost_all_msgs, 
+                                local_msgs, own_msg, server_msgs >>
 
 Get(self) == /\ pc[self] = "Get"
              /\ IF from_server[self] /= <<>>
@@ -104,45 +129,60 @@ Get(self) == /\ pc[self] = "Get"
                    ELSE /\ TRUE
                         /\ UNCHANGED << from_server, local_msgs >>
              /\ pc' = [pc EXCEPT ![self] = "Client"]
-             /\ UNCHANGED << to_server, own_msg, server_msgs >>
+             /\ UNCHANGED << to_server, ghost_all_msgs, own_msg, server_msgs >>
 
 Type(self) == /\ pc[self] = "Type"
               /\ IF Len(own_msg[self]) < MaxMessageLength
                     THEN /\ \E c \in Chars:
                               /\ own_msg' = [own_msg EXCEPT ![self] = Append(own_msg[self], c)]
                               /\ local_msgs' = [local_msgs EXCEPT ![self][self] = own_msg'[self]]
-                              /\ to_server' = [to_server EXCEPT ![self] = Append(to_server[self], [source |-> self, msg |-> own_msg'[self]])]
+                              /\ ghost_all_msgs' = [ghost_all_msgs EXCEPT ![self] = own_msg'[self]]
+                              /\ to_server' = [to_server EXCEPT ![self] = AppendQueue(to_server[self], [source |-> self, msg |-> own_msg'[self]])]
                     ELSE /\ TRUE
-                         /\ UNCHANGED << to_server, local_msgs, own_msg >>
+                         /\ UNCHANGED << to_server, ghost_all_msgs, local_msgs, 
+                                         own_msg >>
               /\ pc' = [pc EXCEPT ![self] = "Get"]
               /\ UNCHANGED << from_server, server_msgs >>
 
 Delete(self) == /\ pc[self] = "Delete"
-                /\ TRUE
+                /\ IF Len(own_msg[self]) = 1
+                      THEN /\ own_msg' = [own_msg EXCEPT ![self] = <<>>]
+                           /\ local_msgs' = [local_msgs EXCEPT ![self][self] = own_msg'[self]]
+                           /\ ghost_all_msgs' = [ghost_all_msgs EXCEPT ![self] = own_msg'[self]]
+                           /\ to_server' = [to_server EXCEPT ![self] = AppendQueue(to_server[self], [source |-> self, msg |-> own_msg'[self]])]
+                      ELSE /\ IF Len(own_msg[self]) > 0
+                                 THEN /\ own_msg' = [own_msg EXCEPT ![self] = SubSeq(own_msg[self], 1, Len(own_msg[self]) - 1)]
+                                      /\ local_msgs' = [local_msgs EXCEPT ![self][self] = own_msg'[self]]
+                                      /\ ghost_all_msgs' = [ghost_all_msgs EXCEPT ![self] = own_msg'[self]]
+                                      /\ to_server' = [to_server EXCEPT ![self] = AppendQueue(to_server[self], [source |-> self, msg |-> own_msg'[self]])]
+                                 ELSE /\ TRUE
+                                      /\ UNCHANGED << to_server, 
+                                                      ghost_all_msgs, 
+                                                      local_msgs, own_msg >>
                 /\ pc' = [pc EXCEPT ![self] = "Get"]
-                /\ UNCHANGED << to_server, from_server, local_msgs, own_msg, 
-                                server_msgs >>
+                /\ UNCHANGED << from_server, server_msgs >>
 
 client(self) == Client(self) \/ Get(self) \/ Type(self) \/ Delete(self)
 
 Serve(self) == /\ pc[self] = "Serve"
                /\ Cardinality(ClientsWithChanges) > 0
                /\ pc' = [pc EXCEPT ![self] = "ReadAndNotify"]
-               /\ UNCHANGED << to_server, from_server, local_msgs, own_msg, 
-                               server_msgs >>
+               /\ UNCHANGED << to_server, from_server, ghost_all_msgs, 
+                               local_msgs, own_msg, server_msgs >>
 
 ReadAndNotify(self) == /\ pc[self] = "ReadAndNotify"
                        /\ IF Cardinality(ClientsWithChanges) > 0
                              THEN /\ \E source_client \in ClientsWithChanges:
                                        /\ from_server' =                [
-                                                           dest_client \in Clients |-> Append(from_server[dest_client], Head(to_server[source_client]))
+                                                           dest_client \in Clients |-> AppendQueue(from_server[dest_client], Head(to_server[source_client]))
                                                          ]
                                        /\ to_server' = [to_server EXCEPT ![source_client] = Tail(to_server[source_client])]
                                   /\ pc' = [pc EXCEPT ![self] = "ReadAndNotify"]
                              ELSE /\ TRUE
                                   /\ pc' = [pc EXCEPT ![self] = "Serve"]
                                   /\ UNCHANGED << to_server, from_server >>
-                       /\ UNCHANGED << local_msgs, own_msg, server_msgs >>
+                       /\ UNCHANGED << ghost_all_msgs, local_msgs, own_msg, 
+                                       server_msgs >>
 
 server(self) == Serve(self) \/ ReadAndNotify(self)
 
@@ -157,9 +197,20 @@ Spec == /\ Init /\ [][Next]_vars
 
 TypeInvariant ==
   /\ \A x, y \in Clients: Len(local_msgs[x][y]) <= MaxMessageLength
+  /\ \A c \in Clients: (Len(to_server[c]) <= MaxQueueLength /\ Len(from_server[c]) <= MaxQueueLength)
+  /\ \A c \in Clients: Len(own_msg[c]) <= MaxMessageLength
+  
+SendsArePropagated ==
+  /\ \A src \in Clients: to_server[src] /= <<>> ~>
+    \A dst \in Clients: from_server[dst] /= <<>>
+    
+EventuallyConsistent ==
+  \A src \in Clients: ghost_all_msgs[src] /= <<>> ~>
+    \A dst \in Clients: local_msgs[dst][src] = ghost_all_msgs[src]
+    
 
 =============================================================================
 \* Modification History
-\* Last modified Mon Nov 19 16:12:25 EST 2018 by john
+\* Last modified Wed Nov 21 12:52:08 EST 2018 by john
 \* Last modified Fri Nov 16 14:18:13 EST 2018 by dsherry
 \* Created Thu Nov 15 11:56:05 EST 2018 by john

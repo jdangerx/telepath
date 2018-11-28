@@ -4,12 +4,9 @@ EXTENDS TLC, Integers, Sequences, FiniteSets
 CONSTANTS Users, Server, MaxMessageLength, Chars, NULL
 
 (*--algorithm telepath
-\* Sequences in to_server and from_server are sequences of updates sent 
-\* between client and server; sequences in ghost_all_messages are the literal
-\* messages the clients have typed 
 variables 
-  to_server = [u \in Users |-> NULL],
-  from_server = [u \in Users |-> NULL];
+  to_server = [u \in Users |-> NULL], \* map from client names to current message
+  from_server = [u \in Users |-> NULL]; \* map from client name to state updates from server (map of maps)
 
 define
 UsersPendingWrite == {u \in Users: to_server[u] /= NULL}
@@ -30,7 +27,7 @@ begin
     await Len(typed) < MaxMessageLength;
     with c \in Chars do
       typed := typed \o c;
-      \* could optimistically update here
+      \* could optimistically update here on frontend
       to_server[self] := typed;
     end with; 
   or \* delete
@@ -125,6 +122,6 @@ ConsistencyWhenDone ==
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Nov 21 15:50:43 EST 2018 by john
+\* Last modified Mon Nov 26 17:02:18 EST 2018 by john
 \* Last modified Fri Nov 16 14:18:13 EST 2018 by dsherry
 \* Created Thu Nov 15 11:56:05 EST 2018 by john

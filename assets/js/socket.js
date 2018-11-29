@@ -14,15 +14,20 @@ socket.connect()
 
 let channel = socket.channel("room:lobby", {})
 
+let chatUsername = document.querySelector("#chat-username");
 let chatInput = document.querySelector("#chat-input");
 let messagesContainer = document.querySelector("#messages");
 
+let allUserState = {};
+
 chatInput.addEventListener("keyup", (event) => {
-  channel.push("new_msg", {body: chatInput.value});
+  channel.push("new_msg", {body: chatInput.value, user: chatUsername.value});
 });
 
 channel.on("new_msg", (payload) => {
-  console.log(payload.body);
+  allUserState[payload.user] = payload.body;
+  console.log(payload);
+  messagesContainer.innerText = JSON.stringify(allUserState);
 });
 
 channel.join()

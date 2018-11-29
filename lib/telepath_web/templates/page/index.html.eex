@@ -1,7 +1,15 @@
-<div id="messages"></div>
-<h1>Username</h1>
-<input id="chat-username" type="text"></input>
-<h1>Message</h1>
-<input id="chat-input" type="text"></input>
+<h1 style="text-align: center">⚡️🔮     TELEPATH     🔮⚡️</h1>
+<hr>
+<div class="text-boxes flex-container">
+  <div class="text-box-left">
+    <h3>Username</h3>
+    <input id="chat-username" type="text" style="font-size: 30px"></input>
+  </div>
+  <div class="text-box-right">
+    <h3>Message</h3>
+    <input id="chat-input" type="text" style="font-size: 30px"></input>
+  </div>
+</div>
+<hr>
 
 <div id="speech-bubbles"></div>

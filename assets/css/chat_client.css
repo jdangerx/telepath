@@ -4,16 +4,17 @@
   display: flex;
   flex-wrap: nowrap;
 }
-.speech-bubble {
+
+.text-boxes {
   margin: 10px;
   text-align: left;
   line-height: 75px;
   font-size: 30px;
 }
 
-.speech-bubble-username {
+.text-box-left {
   width: 15%
 }
-.speech-bubble-message {
+.text-box-right {
   width: 85%
 }

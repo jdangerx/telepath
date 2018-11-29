@@ -23,16 +23,16 @@ let speechBubbles = document.querySelector("#speech-bubbles");
 let allUserState = {};
 
 function makeSpeechBubble(username, message) {
-  var usernameText = document.createTextNode(username);
+  var usernameText = document.createTextNode(username + ":");
   var usernameDiv = document.createElement("div");
   usernameDiv.appendChild(usernameText);
-  usernameDiv.className = "speech-bubble-username";
+  usernameDiv.className = "text-box-left";
   var messageText = document.createTextNode(message);
   var messageDiv = document.createElement("div");
   messageDiv.appendChild(messageText);
-  messageDiv.className = "speech-bubble-message";
+  messageDiv.className = "text-box-right";
   var topDiv = document.createElement("div");
-  topDiv.className = "speech-bubble flex-container";
+  topDiv.className = "text-boxes flex-container";
   topDiv.appendChild(usernameDiv);
   topDiv.appendChild(messageDiv);
   return topDiv;
@@ -42,7 +42,7 @@ function updateSpeechBubbles(state) {
   while (speechBubbles.firstChild) {
     speechBubbles.removeChild(speechBubbles.firstChild);
   }
-  speechBubbles.appendChild(makeSpeechBubble("User", "Message"));
+  // speechBubbles.appendChild(makeSpeechBubble("User", "Message"));
   for (var user in state) {
     var bubble = makeSpeechBubble(state[user].nick, state[user].body);
     speechBubbles.appendChild(bubble);

@@ -17,8 +17,37 @@ let channel = socket.channel("room:lobby", {})
 let chatUsername = document.querySelector("#chat-username");
 let chatInput = document.querySelector("#chat-input");
 let messagesContainer = document.querySelector("#messages");
+let speechBubbles = document.querySelector("#speech-bubbles");
 
 let allUserState = {};
+
+function makeSpeechBubble(username, message) {
+  var usernameText = document.createTextNode(username);
+  var usernameDiv = document.createElement("div");
+  usernameDiv.appendChild(usernameText);
+  usernameDiv.className = "speech-bubble-username";
+  var messageText = document.createTextNode(message);
+  var messageDiv = document.createElement("div");
+  messageDiv.appendChild(messageText);
+  messageDiv.className = "speech-bubble-message";
+  var topDiv = document.createElement("div");
+  topDiv.className = "speech-bubble flex-container";
+  topDiv.appendChild(usernameDiv);
+  topDiv.appendChild(messageDiv);
+  return topDiv;
+}
+
+function updateSpeechBubbles(state) {
+  while (speechBubbles.firstChild) {
+    speechBubbles.removeChild(speechBubbles.firstChild);
+  }
+  speechBubbles.appendChild(makeSpeechBubble("User", "Message"));
+  for (var user in state) {
+    var bubble = makeSpeechBubble(user, state[user]);
+    speechBubbles.appendChild(bubble);
+    console.log('appending for user ' + user);
+  }
+}
 
 chatInput.addEventListener("input", (event) => {
   channel.push("new_msg", {body: chatInput.value, user: chatUsername.value});
@@ -28,6 +57,7 @@ channel.on("new_msg", (payload) => {
   allUserState[payload.user] = payload.body;
   console.log(payload);
   messagesContainer.innerText = JSON.stringify(allUserState);
+  updateSpeechBubbles(allUserState);
 });
 
 channel.join()

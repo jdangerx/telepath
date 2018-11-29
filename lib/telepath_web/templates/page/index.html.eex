@@ -3,3 +3,5 @@
 <input id="chat-username" type="text"></input>
 <h1>Message</h1>
 <input id="chat-input" type="text"></input>
+
+<div id="speech-bubbles"></div>

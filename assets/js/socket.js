@@ -13,6 +13,7 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 
 let channel = socket.channel("room:lobby", {})
+let userId = "";
 
 let chatUsername = document.querySelector("#chat-username");
 let chatInput = document.querySelector("#chat-input");
@@ -43,25 +44,42 @@ function updateSpeechBubbles(state) {
   }
   speechBubbles.appendChild(makeSpeechBubble("User", "Message"));
   for (var user in state) {
-    var bubble = makeSpeechBubble(user, state[user]);
+    var bubble = makeSpeechBubble(state[user].nick, state[user].body);
     speechBubbles.appendChild(bubble);
-    console.log('appending for user ' + user);
   }
 }
 
 chatInput.addEventListener("input", (event) => {
-  channel.push("new_msg", {body: chatInput.value, user: chatUsername.value});
+  channel.push("new_msg", {
+      body: chatInput.value, 
+      user: userId, 
+      nick: chatUsername.value
+  });
 });
 
 channel.on("new_msg", (payload) => {
-  allUserState[payload.user] = payload.body;
-  console.log(payload);
-  messagesContainer.innerText = JSON.stringify(allUserState);
+  allUserState[payload.user] = {
+      body: payload.body,
+      nick: payload.nick
+  } ;
+  updateSpeechBubbles(allUserState);
+});
+
+
+channel.on("user_left", (payload) => {
+  console.log("user left!!", payload);
+  delete allUserState[payload.user];
+  console.log(allUserState);
+  updateSpeechBubbles(allUserState);
+});
+
+channel.on("init_state", (payload) => {
+  allUserState = payload;
   updateSpeechBubbles(allUserState);
 });
 
 channel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
+  .receive("ok", resp => { userId = resp; })
   .receive("error", resp => { console.log("Unable to join", resp) })
 
 export default socket

@@ -10,6 +10,8 @@ defmodule Telepath.Application do
     children = [
       # Start the Ecto repository
       Telepath.Repo,
+      # Start our little state wrapper
+      Telepath.State,
       # Start the endpoint when the application starts
       TelepathWeb.Endpoint
       # Starts a worker by calling: Telepath.Worker.start_link(arg)

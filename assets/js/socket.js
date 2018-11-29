@@ -20,7 +20,7 @@ let messagesContainer = document.querySelector("#messages");
 
 let allUserState = {};
 
-chatInput.addEventListener("keyup", (event) => {
+chatInput.addEventListener("input", (event) => {
   channel.push("new_msg", {body: chatInput.value, user: chatUsername.value});
 });
 
